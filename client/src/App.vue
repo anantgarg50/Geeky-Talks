@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <v-app>
-      <v-navigation-drawer temporary app v-model="drawerToggle">
+      <v-navigation-drawer width="250" temporary app v-model="drawerToggle">
         <v-card tile>
           <v-list class="blue darken-2" dark three-line>
             <v-list-tile class="mt-2">
@@ -9,9 +9,12 @@
                 <v-icon size="75px">fas fa-user-circle</v-icon>
               </v-list-tile-avatar>
             </v-list-tile>
-            <v-list-tile-content class="ml-4 mb-3">
+            <v-list-tile-content v-if="userLoggedIn" class="ml-4 my-2">
               <span class="body-1 pl-3">{{ displayName }}</span>
               <span class="caption pl-3">@{{ username }}</span>
+            </v-list-tile-content>
+            <v-list-tile-content  v-else class="ml-4 my-2">
+              <v-btn color="grey darken-3" @click="userLoggedIn = !userLoggedIn">Sign in</v-btn>
             </v-list-tile-content>  
           </v-list>
         </v-card>
@@ -32,6 +35,22 @@
           <v-icon>fas fa-bars</v-icon>
         </v-btn>
         <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-menu origin="top right" transition="scale-transition">
+          <v-btn icon slot="activator" dark>
+            <v-icon>more_vert</v-icon>
+          </v-btn>
+          <v-list  v-if="userLoggedIn">
+            <v-list-tile v-for="item in toolbarMenuUser" :key="item" @click="true">
+              <v-list-tile-title>{{ item }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+          <v-list  v-else>
+            <v-list-tile v-for="item in toolbarMenuAnonymous" :key="item" @click="true">
+              <v-list-tile-title>{{ item }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
       </v-toolbar>
       <v-content>
         <router-view></router-view>
@@ -72,8 +91,11 @@ export default {
     return {
       drawerToggle: false,
       toolbarTitle: "Home",
+      userLoggedIn: false,
       displayName: "custom name",
       username: "custom username",
+      toolbarMenuAnonymous: ["Sign In", "Register"],
+      toolbarMenuUser: ["Settings", "Logout"],
       navbarLinks: [
         {
           icon: "fas fa-home",
