@@ -13,20 +13,18 @@
               <span class="body-1 pl-3">{{ displayName }}</span>
               <span class="caption pl-3">@{{ username }}</span>
             </v-list-tile-content>
-            <v-list-tile-content  v-else class="ml-4 my-2">
-              <v-btn color="grey darken-3" @click="userLoggedIn = !userLoggedIn">Sign in</v-btn>
+            <v-list-tile-content v-else class="ml-3 my-0">
+              <v-btn class="light-blue accent-4" flat @click="openLoginDialog">Login</v-btn>
             </v-list-tile-content>  
           </v-list>
         </v-card>
         <v-list subheader>
           <v-list-tile v-for="navbarLinks in navbarLinks" :key="navbarLinks.icon"
-            @click.stop="changeToolbarTitle">
+            @click.stop="changeToolbarTitle" v-if="navDrawerItemRender(navbarLinks.name)">
             <v-list-tile-action>
               <v-icon>{{ navbarLinks.icon }}</v-icon>
             </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>{{ navbarLinks.name }}</v-list-tile-title>
-            </v-list-tile-content>
+            <v-list-tile-content>{{ navbarLinks.name }}</v-list-tile-content>
           </v-list-tile>
         </v-list>
       </v-navigation-drawer>
@@ -41,17 +39,77 @@
             <v-icon>more_vert</v-icon>
           </v-btn>
           <v-list  v-if="userLoggedIn">
-            <v-list-tile v-for="item in toolbarMenuUser" :key="item" @click="true">
-              <v-list-tile-title>{{ item }}</v-list-tile-title>
+            <v-list-tile v-for="item in toolbarMenuUser" :key="item.name" @click= "item.action.call($data)">
+              <v-list-tile-title>{{ item.name }}</v-list-tile-title>
             </v-list-tile>
           </v-list>
-          <v-list  v-else>
-            <v-list-tile v-for="item in toolbarMenuAnonymous" :key="item" @click="true">
-              <v-list-tile-title>{{ item }}</v-list-tile-title>
+          <v-list v-else>
+            <v-list-tile v-for="item in toolbarMenuAnonymous" :key="item.name" @click= "item.action.call($data)">
+              <v-list-tile-title>{{ item.name }}</v-list-tile-title>
             </v-list-tile>
           </v-list>
         </v-menu>
       </v-toolbar>
+      <v-dialog v-model="loginDialog" persistent max-width="350px">
+        <v-card>
+          <v-card-title class="primary-title">
+            <v-layout justify-center>
+              <span class="headline">Login</span>
+            </v-layout>
+          </v-card-title>
+          <v-card-text class="pt-0">
+            <v-container class="pt-0" grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12>
+                  <v-text-field label="Email" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="Password" type="password" required></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-container>
+            <small>*indicates required field</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" flat @click.native="loginDialog = false">Close</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="loginDialog = false; userLoggedIn = true;">Login</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="registerDialog" persistent max-width="350px">
+        <v-card>
+          <v-card-title class="primary-title">
+            <v-layout justify-center>
+              <span class="headline">Register</span>
+            </v-layout>
+          </v-card-title>
+          <v-card-text class="pt-0">
+            <v-container class="pt-0" grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12>
+                  <v-text-field label="Name" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="Email" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="Password" type="password" required></v-text-field>
+                </v-flex>
+                <v-flex xs12>
+                  <v-text-field label="Confirm Password" type="password" required></v-text-field>
+                </v-flex>
+              </v-layout>
+            </v-container>
+            <small>*indicates required field</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" flat @click.native="registerDialog = false">Close</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="registerDialog = false">Register</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-content>
         <router-view></router-view>
       </v-content>
@@ -94,20 +152,43 @@ export default {
       userLoggedIn: false,
       displayName: "custom name",
       username: "custom username",
-      toolbarMenuAnonymous: ["Sign In", "Register"],
-      toolbarMenuUser: ["Settings", "Logout"],
+      loginDialog: false,
+      registerDialog: false,
+      val: 40,
+      toolbarMenuAnonymous: [
+        {
+          name: "Login",
+          action: function() {
+            this.loginDialog = true;
+          }
+        },
+        {
+          name: "Register",
+          action: function() {
+            this.registerDialog = true;
+          }
+        }
+      ],
+      toolbarMenuUser: [
+        {
+          name: "My Account",
+          action: function() {}
+        },
+        {
+          name: "Logout",
+          action: function() {
+            this.userLoggedIn = false;
+          }
+        }
+      ],
       navbarLinks: [
         {
           icon: "fas fa-home",
           name: "Home"
         },
         {
-          icon: "fas fa-comments",
-          name: "Discussion"
-        },
-        {
           icon: "fas fa-user",
-          name: "Profile"
+          name: "My Account"
         },
         {
           icon: "fas fa-edit",
@@ -122,21 +203,35 @@ export default {
           name: "About Us"
         }
       ],
-      links: [
-        "Home",
-        "Discussion",
-        "Feedback",
-        "Contact Us",
-        "About Us",
-        "Terms",
-        "Donate"
-      ]
+      links: ["Home", "Feedback", "Contact Us", "About Us", "Terms", "Donate"]
     };
   },
   methods: {
     changeToolbarTitle: function(event) {
-      this.toolbarTitle = event.target.innerText;
+      if (event.target.className == "list__tile__action") {
+        this.toolbarTitle = event.target.parentElement.innerText;
+      } else if (
+        event.target.className == "list__tile__content" ||
+        event.target.className == "list__tile list__tile--link"
+      ) {
+        this.toolbarTitle = event.target.innerText;
+      } else {
+        this.toolbarTitle =
+          event.target.parentElement.parentElement.parentElement.innerText;
+      }
+
       this.drawerToggle = !this.drawerToggle;
+    },
+    openLoginDialog: function() {
+      this.loginDialog = true;
+      this.drawerToggle = false;
+    },
+    navDrawerItemRender: function(item) {
+      if (item == "My Account") {
+        return this.userLoggedIn;
+      } else {
+        return true;
+      }
     }
   }
 };
