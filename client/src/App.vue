@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <v-app>
+
       <v-navigation-drawer width="250" temporary app v-model="drawerToggle">
         <v-card tile>
           <v-list class="blue darken-2" dark three-line>
@@ -28,6 +29,7 @@
           </v-list-tile>
         </v-list>
       </v-navigation-drawer>
+
       <v-toolbar color="blue darken-3" app dark>
         <v-btn icon @click.stop="drawerToggle = !drawerToggle">
           <v-icon>fas fa-bars</v-icon>
@@ -50,6 +52,7 @@
           </v-list>
         </v-menu>
       </v-toolbar>
+
       <v-dialog v-model="loginDialog" persistent max-width="350px">
         <v-card>
           <v-card-title class="primary-title">
@@ -73,10 +76,11 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue darken-1" flat @click.native="loginDialog = false">Close</v-btn>
-            <v-btn color="blue darken-1" flat @click.native="loginDialog = false; userLoggedIn = true;">Login</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="login">Login</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
+
       <v-dialog v-model="registerDialog" persistent max-width="350px">
         <v-card>
           <v-card-title class="primary-title">
@@ -88,16 +92,17 @@
             <v-container class="pt-0" grid-list-md>
               <v-layout wrap>
                 <v-flex xs12>
-                  <v-text-field label="Name" required></v-text-field>
+                  <v-text-field label="Name" v-model="userData.name" required></v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                  <v-text-field label="Email" required></v-text-field>
+                  <v-text-field label="Email" v-model="userData.email" required></v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                  <v-text-field label="Password" type="password" required></v-text-field>
+                  <v-text-field label="Password" type="password" v-model="userData.password" required></v-text-field>
                 </v-flex>
                 <v-flex xs12>
-                  <v-text-field label="Confirm Password" type="password" required></v-text-field>
+                  <v-text-field label="Confirm Password" v-model="userData.confirmPassword"
+                   type="password" required></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -106,13 +111,15 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue darken-1" flat @click.native="registerDialog = false">Close</v-btn>
-            <v-btn color="blue darken-1" flat @click.native="registerDialog = false">Register</v-btn>
+            <v-btn color="blue darken-1" flat @click.native="registerUser">Register</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
+
       <v-content>
         <router-view></router-view>
       </v-content>
+
       <v-footer inset dark class="grey darken-4" height="auto">
         <v-container fluid pa-0>
           <v-layout wrap row pb-1 align-center justify-center>
@@ -138,15 +145,23 @@
           </v-flex>
         </v-container>
       </v-footer>
+      
     </v-app>
   </div>
 </template>
 
 <script>
+import RegisterService from "@/services/RegisterService";
 export default {
   name: "App",
   data: () => {
     return {
+      userData: {
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: null
+      },
       drawerToggle: false,
       toolbarTitle: "Home",
       userLoggedIn: false,
@@ -154,7 +169,6 @@ export default {
       username: "custom username",
       loginDialog: false,
       registerDialog: false,
-      val: 40,
       toolbarMenuAnonymous: [
         {
           name: "Login",
@@ -222,16 +236,28 @@ export default {
 
       this.drawerToggle = !this.drawerToggle;
     },
+
     openLoginDialog: function() {
       this.loginDialog = true;
       this.drawerToggle = false;
     },
+
+    login: function() {
+      this.loginDialog = false;
+      this.userLoggedIn = true;
+    },
+
     navDrawerItemRender: function(item) {
       if (item == "My Account") {
         return this.userLoggedIn;
       } else {
         return true;
       }
+    },
+
+    async registerUser() {
+      const response = await RegisterService.register(this.userData);
+      console.log(response);
     }
   }
 };
