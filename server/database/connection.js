@@ -6,14 +6,15 @@ const uri =
   "cluster0-shard-00-02-enrzj.mongodb.net:27017" +
   "/test?ssl=true&replicaSet=cluster0-shard-0&authSource=admin";
 
-mongoose.connect(uri, function() {
-  console.log("Database Connection Successful!");
-});
-
 mongoose.Promise = global.Promise;
 
-const db = mongoose.connection;
+mongoose
+  .connect(uri)
+  .then(() => {
+    console.log("Connected to MongoDB!");
+  })
+  .catch(err => {
+    console.log("Connection Error: " + err);
+  });
 
-db.on("error", console.error.bind(console, "DataBase Connection Error!"));
-
-module.exports = mongoose;
+module.exports = mongoose.connection;

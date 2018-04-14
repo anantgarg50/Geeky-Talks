@@ -27,20 +27,9 @@ var db = require("./database/connection");
 
 // Mongoose Models
 var User = require("./database/models/userModel");
-//var postSchema = require('./database/models/postModel');
+var Post = require("./database/models/postModel");
 
-app.get("/", (req, res) => {
-  res.send({
-    message: "Hello World!"
-  });
-});
-
-app.post("/register", (req, res) => {
-  res.send({
-    message: `${req.body.email} is registered!`
-  });
-  console.log(`${req.body.email} is registered!`);
-});
+require("./routes.js")(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
