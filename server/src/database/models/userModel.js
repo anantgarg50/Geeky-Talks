@@ -9,8 +9,10 @@ let userSchema = new Schema({
   },
   userId: {
     type: String,
+    trim: true,
     index: {
-      unique: true
+      unique: true,
+      partialFilterExpression: { userId: { $type: "string" } }
     }
   },
   password: {

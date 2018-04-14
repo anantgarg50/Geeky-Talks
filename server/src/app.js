@@ -26,7 +26,6 @@ app.use(cookieParser());
 var db = require("./database/connection");
 
 // Mongoose Models
-var User = require("./database/models/userModel");
 var Post = require("./database/models/postModel");
 
 require("./routes.js")(app);
