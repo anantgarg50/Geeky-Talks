@@ -81,40 +81,7 @@
         </v-card>
       </v-dialog>
 
-      <v-dialog v-model="registerDialog" persistent max-width="350px">
-        <v-card>
-          <v-card-title class="primary-title">
-            <v-layout justify-center>
-              <span class="headline">Register</span>
-            </v-layout>
-          </v-card-title>
-          <v-card-text class="pt-0">
-            <v-container class="pt-0" grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12>
-                  <v-text-field label="Name" v-model="userData.name" required></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field label="Email" v-model="userData.email" required></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field label="Password" type="password" v-model="userData.password" required></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field label="Confirm Password" v-model="userData.confirmPassword"
-                   type="password" required></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-container>
-            <small>*indicates required field</small>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="registerDialog = false">Close</v-btn>
-            <v-btn color="blue darken-1" flat @click.native="registerUser">Register</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <register-dialog></register-dialog>
 
       <v-content>
         <router-view></router-view>
@@ -151,24 +118,18 @@
 </template>
 
 <script>
-import RegisterService from "@/services/RegisterService";
+import { eventBus } from "./eventBus";
 export default {
   name: "App",
   data: () => {
     return {
-      userData: {
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: null
-      },
       drawerToggle: false,
       toolbarTitle: "Home",
       userLoggedIn: false,
       displayName: "custom name",
       username: "custom username",
       loginDialog: false,
-      registerDialog: false,
+
       toolbarMenuAnonymous: [
         {
           name: "Login",
@@ -179,7 +140,7 @@ export default {
         {
           name: "Register",
           action: function() {
-            this.registerDialog = true;
+            eventBus.$emit("registerDialog", true);
           }
         }
       ],
@@ -247,17 +208,16 @@ export default {
       this.userLoggedIn = true;
     },
 
+    openRegisterDialog: function() {
+      eventBus.$emit("registerDialog", true);
+    },
+
     navDrawerItemRender: function(item) {
       if (item == "My Account") {
         return this.userLoggedIn;
       } else {
         return true;
       }
-    },
-
-    async registerUser() {
-      const response = await RegisterService.register(this.userData);
-      console.log(response);
     }
   }
 };
