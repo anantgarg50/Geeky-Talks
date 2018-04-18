@@ -6,6 +6,12 @@
 					<span class="headline">Register</span>
 				</v-layout>
 			</v-card-title>
+      <v-alert class="mx-3"
+       :value="alert.visible" 
+       :color="alert.color" 
+       transition="scale-transition">
+        {{alert.message}}
+      </v-alert>
       <v-form v-model="valid" ref="registerForm" lazy-validation>
         <v-card-text class="pt-0">
           <v-container class="pt-0" grid-list-md>
@@ -34,7 +40,7 @@
                   :append-icon="e2 ? 'visibility' : 'visibility_off'"
                   :append-icon-cb="() => (e2 = !e2)"
                   :type="e2 ? 'password' : 'text'"
-                  :rules="[rules.required, matchPasswords]"
+                  :rules="[rules.required, rules.password]"
                   v-model="userData.confirmPassword"
                   required></v-text-field>
               </v-flex>
@@ -44,7 +50,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="registerDialog = false">Close</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="close
+          ">Close</v-btn>
           <v-btn color="blue darken-1" flat @click.native="registerUser">Register</v-btn>
         </v-card-actions>
       </v-form>
@@ -61,6 +68,11 @@ export default {
       valid: false, //Form Validity
       e1: true, //Password Visibility
       e2: true, //Confirm password Visibility
+      alert: {
+        visible: false,
+        color: "error",
+        message: ""
+      }, //Alert
       userData: {
         name: "",
         email: "",
@@ -91,15 +103,35 @@ export default {
           name: this.userData.name,
           email: this.userData.email,
           password: this.userData.password
-        });
-        console.log(response);
+        })
+          .then(
+            function(response) {
+              this.alert.message = response.data.message;
+              this.alert.color = "success";
+              this.alert.visible = true;
 
-        setTimeout(() => {
-          this.registerDialog = false;
-        }, 1500);
+              this.$refs.registerForm.reset();
 
-        this.$refs.registerForm.reset();
+              setTimeout(() => {
+                this.registerDialog = false;
+                this.alert.visible = false;
+              }, 3000);
+            }.bind(this)
+          )
+          .catch(
+            function(error) {
+              this.alert.message = error.response.data.error;
+              this.alert.color = "error";
+              this.alert.visible = true;
+            }.bind(this)
+          );
       }
+    },
+
+    close: function() {
+      this.$refs.registerForm.reset();
+      this.registerDialog = false;
+      this.alert.visible = false;
     }
   },
 
