@@ -40,7 +40,7 @@
                   :append-icon="e2 ? 'visibility' : 'visibility_off'"
                   :append-icon-cb="() => (e2 = !e2)"
                   :type="e2 ? 'password' : 'text'"
-                  :rules="[rules.required, rules.password]"
+                  :rules="[rules.required, matchPasswords]"
                   v-model="userData.confirmPassword"
                   required></v-text-field>
               </v-flex>
@@ -109,6 +109,8 @@ export default {
               this.alert.message = response.data.message;
               this.alert.color = "success";
               this.alert.visible = true;
+              this.e1 = true;
+              this.e2 = true;
 
               this.$refs.registerForm.reset();
 
@@ -132,6 +134,8 @@ export default {
       this.$refs.registerForm.reset();
       this.registerDialog = false;
       this.alert.visible = false;
+      this.e1 = true;
+      this.e2 = true;
     }
   },
 
