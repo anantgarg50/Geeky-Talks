@@ -5,18 +5,18 @@
       <v-navigation-drawer width="250" temporary app v-model="drawerToggle">
         <v-card tile>
           <v-list class="blue darken-2" dark three-line>
-            <v-list-tile class="mt-2">
-              <v-list-tile-avatar size="75" class="ml-3 pt-4">
+            <v-list-tile class="mt-3">
+              <v-list-tile-avatar size="75">
                 <v-icon size="75px">fas fa-user-circle</v-icon>
               </v-list-tile-avatar>
-            </v-list-tile>
-            <v-list-tile-content v-if="userLoggedIn" class="ml-4 my-2">
+              <v-list-tile-content v-if="userLoggedIn" class="my-2">
               <span class="body-1 pl-3">{{ displayName }}</span>
               <span class="caption pl-3">@{{ username }}</span>
             </v-list-tile-content>
-            <v-list-tile-content v-else class="ml-3 my-0">
-              <v-btn class="light-blue accent-4" flat @click="openLoginDialog">Login</v-btn>
-            </v-list-tile-content>  
+             <v-list-tile-content v-else class="my-2">
+              <span class="body-1 pl-3">Hey Stranger!</span>
+            </v-list-tile-content>
+            </v-list-tile>
           </v-list>
         </v-card>
         <v-list subheader>
@@ -34,7 +34,7 @@
         <v-btn icon @click.stop="drawerToggle = !drawerToggle">
           <v-icon>fas fa-bars</v-icon>
         </v-btn>
-        <v-toolbar-title>{{ toolbarTitle }}</v-toolbar-title>
+        <v-toolbar-title>GeekyTalks</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-menu origin="top right" transition="scale-transition">
           <v-btn icon slot="activator" dark>
@@ -53,33 +53,7 @@
         </v-menu>
       </v-toolbar>
 
-      <v-dialog v-model="loginDialog" persistent max-width="350px">
-        <v-card>
-          <v-card-title class="primary-title">
-            <v-layout justify-center>
-              <span class="headline">Login</span>
-            </v-layout>
-          </v-card-title>
-          <v-card-text class="pt-0">
-            <v-container class="pt-0" grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12>
-                  <v-text-field label="Email" required></v-text-field>
-                </v-flex>
-                <v-flex xs12>
-                  <v-text-field label="Password" type="password" required></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-container>
-            <small>*indicates required field</small>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click.native="loginDialog = false">Close</v-btn>
-            <v-btn color="blue darken-1" flat @click.native="login">Login</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <login-dialog></login-dialog>
 
       <register-dialog></register-dialog>
 
@@ -93,11 +67,12 @@
             <v-flex xs12>
               <v-layout wrap justify-center>
                 <v-btn color="white" flat 
-                  v-for="link in links" :key="link">
-                  {{ link }}
+                  v-for="links in links" :key="links.name">
+                  {{ links.name }}
                 </v-btn>
                 <v-tooltip top color="blue darken-4">
-                  <v-btn slot="activator" color="white--text" icon>  
+                  <v-btn slot="activator" color="white--text" icon 
+                    href="https://github.com/anantgarg50/Geeky-Talks">  
                     <v-icon size="30px">code</v-icon>
                   </v-btn>
                   <span>See Source</span>
@@ -124,17 +99,15 @@ export default {
   data: () => {
     return {
       drawerToggle: false,
-      toolbarTitle: "Home",
       userLoggedIn: false,
       displayName: "custom name",
       username: "custom username",
-      loginDialog: false,
 
       toolbarMenuAnonymous: [
         {
           name: "Login",
           action: function() {
-            this.loginDialog = true;
+            eventBus.$emit("loginDialog", true);
           }
         },
         {
@@ -162,6 +135,10 @@ export default {
           name: "Home"
         },
         {
+          icon: "fas fa-pencil-alt",
+          name: "Create Post"
+        },
+        {
           icon: "fas fa-user",
           name: "My Account"
         },
@@ -178,47 +155,53 @@ export default {
           name: "About Us"
         }
       ],
-      links: ["Home", "Feedback", "Contact Us", "About Us", "Terms", "Donate"]
+      links: [
+        {
+          name: "Home",
+          link: ""
+        },
+        {
+          name: "Feedback",
+          link: ""
+        },
+        {
+          name: "Contact Us",
+          link: ""
+        },
+        {
+          name: "About Us",
+          link: ""
+        },
+        {
+          name: "Terms",
+          link: ""
+        },
+        {
+          name: "Donate",
+          link: ""
+        }
+      ]
     };
   },
   methods: {
-    changeToolbarTitle: function(event) {
-      if (event.target.className == "list__tile__action") {
-        this.toolbarTitle = event.target.parentElement.innerText;
-      } else if (
-        event.target.className == "list__tile__content" ||
-        event.target.className == "list__tile list__tile--link"
-      ) {
-        this.toolbarTitle = event.target.innerText;
-      } else {
-        this.toolbarTitle =
-          event.target.parentElement.parentElement.parentElement.innerText;
-      }
-
-      this.drawerToggle = !this.drawerToggle;
-    },
-
-    openLoginDialog: function() {
-      this.loginDialog = true;
-      this.drawerToggle = false;
-    },
-
-    login: function() {
-      this.loginDialog = false;
-      this.userLoggedIn = true;
-    },
-
     openRegisterDialog: function() {
       eventBus.$emit("registerDialog", true);
     },
 
     navDrawerItemRender: function(item) {
-      if (item == "My Account") {
+      if (item == "My Account" || item == "Create Post") {
         return this.userLoggedIn;
       } else {
         return true;
       }
     }
+  },
+
+  created() {
+    var vm = this;
+    eventBus.$on("userLoggedIn", value => {
+      vm.userLoggedIn = value;
+    });
   }
 };
 </script>
