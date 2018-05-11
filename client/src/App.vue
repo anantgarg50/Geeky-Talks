@@ -20,8 +20,9 @@
           </v-list>
         </v-card>
         <v-list subheader>
-          <v-list-tile v-for="navbarLinks in navbarLinks" :key="navbarLinks.icon"
-            @click.stop="changeToolbarTitle" v-if="navDrawerItemRender(navbarLinks.name)">
+          <v-list-tile v-for="navbarLinks in navbarLinks" :key="navbarLinks.icon" 
+            @click.stop="navigateTo(navbarLinks.link); drawerToggle = false" 
+            v-if="navDrawerItemRender(navbarLinks.name)">
             <v-list-tile-action>
               <v-icon>{{ navbarLinks.icon }}</v-icon>
             </v-list-tile-action>
@@ -66,7 +67,7 @@
           <v-layout wrap row pb-1 align-center justify-center>
             <v-flex xs12>
               <v-layout wrap justify-center>
-                <v-btn color="white" flat 
+                <v-btn color="white" flat @click="navigateTo(links.link)"
                   v-for="links in links" :key="links.name">
                   {{ links.name }}
                 </v-btn>
@@ -119,10 +120,6 @@ export default {
       ],
       toolbarMenuUser: [
         {
-          name: "My Account",
-          action: function() {}
-        },
-        {
           name: "Logout",
           action: function() {
             this.userLoggedIn = false;
@@ -132,53 +129,59 @@ export default {
       navbarLinks: [
         {
           icon: "fas fa-home",
-          name: "Home"
+          name: "Home",
+          link: "/"
         },
         {
           icon: "fas fa-pencil-alt",
-          name: "Create Post"
+          name: "Create Post",
+          link: "/create-post"
         },
         {
           icon: "fas fa-user",
-          name: "My Account"
+          name: "My Account",
+          link: "/my-account"
         },
         {
           icon: "fas fa-edit",
-          name: "Feedback"
+          name: "Feedback",
+          link: "/feedback"
         },
         {
           icon: "fas fa-address-card",
-          name: "Contact Us"
+          name: "Contact Us",
+          link: "/contact-us"
         },
         {
           icon: "fas fa-info-circle",
-          name: "About Us"
+          name: "About Us",
+          link: "/about-us"
         }
       ],
       links: [
         {
           name: "Home",
-          link: ""
+          link: "/"
         },
         {
           name: "Feedback",
-          link: ""
+          link: "/feedback"
         },
         {
           name: "Contact Us",
-          link: ""
+          link: "/contact-us"
         },
         {
           name: "About Us",
-          link: ""
+          link: "/about-us"
         },
         {
           name: "Terms",
-          link: ""
+          link: "/terms"
         },
         {
           name: "Donate",
-          link: ""
+          link: "/donate"
         }
       ]
     };
@@ -194,6 +197,10 @@ export default {
       } else {
         return true;
       }
+    },
+
+    navigateTo: function(route) {
+      this.$router.push(route);
     }
   },
 

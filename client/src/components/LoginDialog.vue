@@ -76,8 +76,17 @@ export default {
   methods: {
     login() {
       if (this.$refs.loginForm.validate()) {
-        this.loginDialog = false;
         eventBus.$emit("userLoggedIn", true);
+        this.alert.message = "Login Success!";
+        this.alert.color = "success";
+        this.alert.visible = true;
+
+        setTimeout(() => {
+          this.loginDialog = false;
+          this.alert.visible = false;
+        }, 3000);
+
+        this.$refs.loginForm.reset();
       }
     },
 
